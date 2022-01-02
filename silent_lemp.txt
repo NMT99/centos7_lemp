@@ -1,0 +1,59 @@
+###nginx
+sudo systemctl stop firewalld && sudo systemctl disable firewalld ;
+sudo yum -y install vim nano epel-release bash-completion bash-completion-extras net-tools ;
+sudo yum -y install epel-release ;
+sudo yum -y install nginx ;
+###mariadb
+sudo curl -LsS -O https://downloads.mariadb.com/MariaDB/mariadb_repo_setup ;
+sudo bash mariadb_repo_setup --mariadb-server-version=10.5
+sudo yum makecache;
+sudo yum -y install MariaDB-server MariaDB-client MariaDB-backup ;
+sudo systemctl enable mariadb && sudo systemctl start mariadb ;
+###php7.4
+sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm ;
+sudo yum -y install http://rpms.remirepo.net/enterprise/remi-release-7.rpm ;
+sudo yum install epel-release yum-utils -y ;
+sudo yum-config-manager --disable 'remi-php*' ;
+#or sudo yum-config-manager --enable remi-php80 ;
+sudo yum-config-manager --enable remi-php74 ;
+sudo yum -y install php php-mysql ;
+sudo yum -y install php php-{cli,fpm,mysqlnd,zip,devel,gd,mbstring,curl,xml,pear,bcmath,json} ;
+echo PHP installed successfully ! ;
+###phpmyadmin
+sudo yum -y install phpmyadmin ;
+sudo systemctl enable php-fpm.service ;
+touch /etc/nginx/conf.d/phpmyadmin.conf ;
+echo "server {
+        listen   9999;
+        server_name site1.com;
+        root /usr/share/phpMyAdmin;
+
+location / {
+        index  index.php;
+        }
+
+## Images and static content is treated differently
+        location ~* ^.+.(jpg|jpeg|gif|css|png|js|ico|xml)$ {
+        access_log        off;
+        expires           30d;
+    }
+
+location ~ /\.ht {
+        deny  all;
+        }
+
+location ~ /(libraries|setup/frames|setup/libs) {
+        deny all;
+        return 404;
+    }
+
+location ~ \.php$ {
+        include /etc/nginx/fastcgi_params;
+        fastcgi_pass 127.0.0.1:9000;
+        fastcgi_index index.php;
+        fastcgi_param SCRIPT_FILENAME /usr/share/phpMyAdmin$fastcgi_script_name;
+                    }
+    }
+" > /etc/nginx/conf.d/phpmyadmin.conf ;
+sudo systemctl restart nginx ;
+echo LEMP was installed successfully !
