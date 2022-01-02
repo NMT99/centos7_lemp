@@ -1,0 +1,218 @@
+#1 nginx
+#2 mariadb 10.5
+#3 php 7.4
+#4 phpMyadmin
+# You can set your domain document root directory to any location you want. The most common locations for webroot include:
+#/home/<user_name>/<site_name>
+#/var/www/<site_name>
+#/var/www/html/<site_name>
+#/opt/<site_name>
+#/usr/share/nginx/html
+
+# rat lau sudo yum update -y ;
+#0 needed
+yum install net-tools ;
+sudo yum -y install vim nano epel-release bash-completion bash-completion-extras ;
+exit va login vao lai.
+
+#1 disable firewalld
+sudo systemctl stop firewalld && sudo systemctl disable firewalld ;
+
+#2 nginx 
+sudo rpm -Uvh http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm ;
+sudo yum install nginx -y ;
+sudo systemctl enable nginx && sudo systemctl start nginx ;
+sudo systemctl status nginx ;
+
+
+
+
+#----------------cach nay OK nhat -----------------
+#nginx cach 2:
+sudo yum -y install epel-release ;
+sudo yum -y install nginx ;
+
+server {
+       listen       80;
+       listen       [::]:80;
+       server_name  _;
+       root         /usr/share/nginx/html;
+
+       # Load configuration files for the default server block.
+       include /etc/nginx/default.d/*.conf;
+i
+       error_page 404 /404.html;
+       location = /404.html {
+       }
+
+       error_page 500 502 503 504 /50x.html;
+       location = /50x.html {
+       }
+   }
+#------------------------------------------
+
+
+
+#Thu muc mac dinh load index cua nginx: /usr/share/nginx/html/
+#Duong dan mac dinh chua file cau hinh nginx: /etc/nginx/conf.d/
+
+
+
+#sudo systemctl restart nginx ; or reload
+#sudo service nginx restart ; 
+
+sudo mv /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf.bak ;
+#tao file cau hinh moi
+sudo nano /etc/nginx/conf.d/site1.conf 
+--> paste vao
+
+#day la duong dan goc /usr/share/nginx/html
+#co the thay doi bang cach tao them thu muc chua trang web  
+
+server {
+    listen  80;
+
+    server_name site1.com www.site1.com;
+
+    location / {
+        root  /usr/share/nginx/html/site1;
+        index  index.html index.htm;
+        try_files $uri $uri/ =404;
+    }
+
+    error_page  500 502 503 504  /50x.html;
+    location = /50x.html {
+        root  /usr/share/nginx/html;
+    }
+}
+
+
+#hoac
+#o day minh chon 3
+server {
+    listen  80;
+
+    server_name site1.com www.site1.com;
+
+    location / {
+        root  /usr/share;
+        index  index.html index.htm;
+        try_files $uri $uri/ =404;
+    }
+
+    error_page  500 502 503 504  /50x.html;
+    location = /50x.html {
+        root  /usr/share/nginx;
+    }
+}
+----------------------------------
+#hoac doi qua directory khac
+
+server {
+    listen  80;
+
+    server_name site1.com www.site1.com;
+
+    location / {
+        root  /usr/share/nginx;
+        index  index.html index.htm;
+        try_files $uri $uri/ =404;
+    }
+
+    error_page  500 502 503 504  /50x.html;
+    location = /50x.html {
+        root  /usr/share/nginx;
+    }
+}
+
+#tao cac thu muc chua trang web khac
+#sudo mkdir -p /usr/share/nginx/html/site1 /usr/share/nginx/html/site2 /usr/share/nginx/html/site3 ....
+
+
+sudo mkidr -p /usr/share/nginx/site1foder ;
+
+touch /usr/share/nginx/site1foder/index.html;
+
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>Welcome to site1 foder!</title>
+<style>
+    body {
+        width: 35em;
+        margin: 0 auto;
+        font-family: Tahoma, Verdana, Arial, sans-serif;
+    }
+</style>
+</head>
+<body>
+<h1>Welcome to nginx!</h1>
+<p>pwd: /usr/share/nginx/site1/index.html </p>
+
+<p>For online documentation and support please refer to
+<a href="http://nginx.org/">nginx.org</a>.<br/>
+Commercial support is available at
+<a href="http://nginx.com/">nginx.com</a>.</p>
+
+<p><em>Config by Tu</em></p>
+</body>
+</html>
+
+
+
+sudo service nginx reload ; 
+-----------------------------------------------------------------------
+###mariadb
+sudo curl -LsS -O https://downloads.mariadb.com/MariaDB/mariadb_repo_setup ;
+sudo bash mariadb_repo_setup --mariadb-server-version=10.5
+sudo yum makecache;
+sudo yum -y install MariaDB-server MariaDB-client MariaDB-backup ;
+sudo systemctl enable mariadb && sudo systemctl start mariadb ;
+sudo systemctl status mariadb ;
+----------------------------------
+
+#sudo mariadb-secure-installation;
+#dang nhap mysql: sudo mysql -u root -p;
+
+
+
+### php
+sudo yum -y install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm ;
+sudo yum -y install http://rpms.remirepo.net/enterprise/remi-release-7.rpm ;
+sudo yum install epel-release yum-utils -y ;
+sudo yum-config-manager --disable 'remi-php*' ;
+#or sudo yum-config-manager --enable remi-php80 ;
+sudo yum-config-manager --enable remi-php74 ;
+sudo yum -y install php php-mysql ;
+sudo yum -y install php php-{cli,fpm,mysqlnd,zip,devel,gd,mbstring,curl,xml,pear,bcmath,json} ;
+#sudo systemctl restart httpd.service ;
+echo PHP installed successfully ! ;
+
+
+
+
+
+### phpmyadmin
+### da doi qua port 3000
+sudo yum -y install phpmyadmin
+#cau hinh dung ma ko login vao dc thi
+sudo systemctl restart php-fpm.service ;
+sudo systemctl enable php-fpm.service ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
