@@ -56,5 +56,6 @@ location ~ \.php$ {
                     }
     }
 " > /etc/nginx/conf.d/phpmyadmin.conf ;
+sudo systemctl enable nginx ;
 sudo systemctl restart nginx ;
 echo LEMP was installed successfully !
