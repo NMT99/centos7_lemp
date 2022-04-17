@@ -22,6 +22,7 @@ echo PHP installed successfully ! ;
 ###phpmyadmin
 sudo yum -y install phpmyadmin ;
 sudo systemctl enable php-fpm.service ;
+sudo chown -R $USER:root /etc/nginx
 touch /etc/nginx/conf.d/phpmyadmin.conf ;
 echo "server {
         listen   9999;
